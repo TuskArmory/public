@@ -33,10 +33,6 @@ let axes = [
 let lanes = 2;
 let actionBarMessage = "";
 
-function isStraightLine(posA, posB) {
-  return posA.getX() == posB.getX() || posB.getZ() == posA.getZ();
-}
-
 function getRailLength() {
   let goal_index = 1;
   let dist = 0;
