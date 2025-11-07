@@ -399,7 +399,7 @@ function main(recursive) {
       break;
     }
     if (
-      !isOnLine(part, route[possible_goal_index], blockPos) ||
+      !isOnLine(part, route[possible_goal_index], blockPos) &&
       possible_goal_index != route.length - 1
     ) {
       possible_goal_index += 1;
