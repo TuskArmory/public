@@ -106,7 +106,6 @@ function summonItem(
         if (predicate != undefined && !predicate(item)) {
           continue;
         }
-        Chat.log(`${slot}`);
         inv.swapHotbar(slot, preferredHotbarSlot);
         Time.sleep(250);
         inv.setSelectedHotbarSlotIndex(preferredHotbarSlot);
@@ -141,7 +140,6 @@ function safeWalkTo(x, z, precise, timeout) {
       tz = blockToCoordinate(z);
     }
   }
-  //   Chat.log("walking to " + tx + ", " + tz);
 
   KeyBind.keyBind("key.forward", true);
   let timer = 0;
@@ -390,7 +388,6 @@ function main(recursive) {
       continue;
     }
 
-    Chat.log(`on line ${possible_goal_index}`);
     predecessor = part;
     successor = route[possible_goal_index];
     possible_goal_index += 1;
@@ -424,7 +421,6 @@ function main(recursive) {
 
       if (!isOnLine(part, route[goal_index], blockPos) && !started_cleaning) {
         goal_index += increment;
-        Chat.log(`starting line ${goal_index}`);
         continue;
       }
       started_cleaning = true;
