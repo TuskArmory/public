@@ -106,7 +106,6 @@ function summonItem(
         if (predicate != undefined && !predicate(item)) {
           continue;
         }
-        Chat.log(`${slot}`);
         inv.swapHotbar(slot, preferredHotbarSlot);
         Time.sleep(250);
         inv.setSelectedHotbarSlotIndex(preferredHotbarSlot);
@@ -141,8 +140,6 @@ function safeWalkTo(x, z, precise, timeout) {
       tz = blockToCoordinate(z);
     }
   }
-  //   Chat.log("walking to " + tx + ", " + tz);
-
   KeyBind.keyBind("key.forward", true);
   let timer = 0;
   let flag = false;
