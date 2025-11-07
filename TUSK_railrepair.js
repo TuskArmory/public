@@ -21,7 +21,7 @@ let BlueCoveIcenia = [
   PositionCommon.createBlockPos(-7639, 10, -358),
   PositionCommon.createBlockPos(-3837, 10, -4160),
 ];
-let route = BlueCoveIcenia;
+let route = BlueCoveIcenia
 
 let axes = [
   "minecraft:diamond_axe",
@@ -232,23 +232,7 @@ function eat() {
   return false;
 }
 
-function rotateUnit45Deg(direction) {
-  return PositionCommon.createPos(
-    direction.getX(),
-    direction.getY(),
-    direction.getZ()
-  );
-}
 function cleanLine(pointA, pointB, reversed) {
-  let direction = PositionCommon.createPos(
-    pointB.getX() - pointA.getX(),
-    pointB.getY() - pointA.getY(),
-    pointB.getZ() - pointA.getZ()
-  )
-    .toVector()
-    .normalize()
-    .getEnd();
-
   KeyBind.keyBind("key.sprint", true);
   KeyBind.keyBind("key.attack", true);
   let refreshDirection = getRouteRightRailCleanDir(pointA, pointB);
@@ -262,7 +246,7 @@ function cleanLine(pointA, pointB, reversed) {
   let jumping = 4;
   while (Math.round(plr.getBlockPos().distanceTo(pointB)) > 0) {
     // Walk to the next block
-    if (plr.getPos().getY() < pointA.getY()) {
+    if ((pointA.getY() - plr.getPos().getY()) > 0.6) {
       KeyBind.keyBind("key.right", false);
       KeyBind.keyBind("key.attack", false);
       if (pointA.getY() - plr.getBlockPos().getY() > 10) {
@@ -301,7 +285,7 @@ function cleanLine(pointA, pointB, reversed) {
     plr.lookAt(lookDir.getX(), lookDir.getY(), lookDir.getZ());
     Client.waitTick();
     KeyBind.keyBind("key.attack", true);
-    KeyBind.keyBind("key.right", plr.getBlockPos().getY() == pointA.getY());
+    KeyBind.keyBind("key.right", true);
     eat();
     // Correct y-level if fallen
     let progress = Math.round(
@@ -405,6 +389,8 @@ function main(recursive) {
       possible_goal_index += 1;
       continue;
     }
+
+    Chat.log(`on line ${possible_goal_index}`);
     predecessor = part;
     successor = route[possible_goal_index];
     possible_goal_index += 1;
@@ -438,6 +424,7 @@ function main(recursive) {
 
       if (!isOnLine(part, route[goal_index], blockPos) && !started_cleaning) {
         goal_index += increment;
+        Chat.log(`starting line ${goal_index}`);
         continue;
       }
       started_cleaning = true;
