@@ -21,7 +21,7 @@ let BlueCoveIcenia = [
   PositionCommon.createBlockPos(-7639, 10, -358),
   PositionCommon.createBlockPos(-3837, 10, -4160),
 ];
-let route = BlueCoveIcenia
+let routeTemplate = BlueCoveIcenia;
 
 let axes = [
   "minecraft:diamond_axe",
@@ -33,7 +33,7 @@ let axes = [
 let lanes = 2;
 let actionBarMessage = "";
 
-function getRailLength() {
+function getRailLength(route) {
   let goal_index = 1;
   let dist = 0;
   for (part of route) {
@@ -106,6 +106,7 @@ function summonItem(
         if (predicate != undefined && !predicate(item)) {
           continue;
         }
+        Chat.log(`${slot}`);
         inv.swapHotbar(slot, preferredHotbarSlot);
         Time.sleep(250);
         inv.setSelectedHotbarSlotIndex(preferredHotbarSlot);
@@ -140,6 +141,7 @@ function safeWalkTo(x, z, precise, timeout) {
       tz = blockToCoordinate(z);
     }
   }
+  //   Chat.log("walking to " + tx + ", " + tz);
 
   KeyBind.keyBind("key.forward", true);
   let timer = 0;
@@ -291,7 +293,7 @@ function cleanLine(pointA, pointB, reversed) {
     );
     actionBarMessage =
       `§aCleaning from (${pointA.getX()},${pointA.getY()},${pointA.getZ()}) to (${pointB.getX()},${pointB.getY()},${pointB.getZ()})` +
-      ` (${100 - progress}%)`;
+      ` (${100 - progress}%)`
   }
   KeyBind.keyBind("key.attack", false);
   KeyBind.keyBind("key.right", false);
@@ -369,8 +371,10 @@ function actionBarManager() {
 
 function main(recursive) {
   let blockPos = plr.getBlockPos();
+  let route = routeTemplate.slice()
   let routeStart = route[0];
   let routeEnd = route[route.length - 1];
+
   const startTime = Time.time();
 
   let started_cleaning = false;
@@ -381,8 +385,8 @@ function main(recursive) {
       break;
     }
     if (
-      !isOnLine(part, route[possible_goal_index], blockPos) &&
-      possible_goal_index != route.length - 1
+      (!isOnLine(part, route[possible_goal_index], blockPos)) &&
+      possible_goal_index < route.length - 1
     ) {
       possible_goal_index += 1;
       continue;
@@ -412,7 +416,7 @@ function main(recursive) {
       route.reverse();
     }
 
-    Chat.log(`§aRunning rail repair for ${Math.round(getRailLength())}m`);
+    Chat.log(`§aRunning rail repair for ${Math.round(getRailLength(route))}m`);
     let goal_index = 1;
     for (part of route) {
       if (goal_index >= route.length) {
@@ -442,12 +446,12 @@ function main(recursive) {
       main(true);
     }
 
-    let length = getRailLength();
+    let length = getRailLength(route);
     let time = (Time.time() - startTime) / 1000;
     if (!recursive) {
       // m/s should be about half the standard movement speed because you have two passes. Depending on the terrain of the rail this could also be worse, like the Pavia-Icenia rail which has holes in the walkway
       Chat.log(
-        `§a${Math.round(getRailLength())}m of rail repaired at ${Math.round(
+        `§a${Math.round(getRailLength(route))}m of rail repaired at ${Math.round(
           length / time
         )}m/s`
       );
@@ -464,6 +468,7 @@ function main(recursive) {
     Chat.log(
       `§4Please start the bot in the middle of the rail line with these points: (${route0X}, ${route0Y}, ${route0Z}) => (${route1X}, ${route1Y}, ${route1Z})`
     );
+    JsMacros.disableScriptListeners("Tick");
   }
 }
 
