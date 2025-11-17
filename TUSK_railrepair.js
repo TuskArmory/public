@@ -352,12 +352,7 @@ function getRouteRightRailCleanDir(predecessor, successor) {
   } else if (Math.abs(resultZ) < 0.6) {
     resultZ = 0;
   }
-    
-  Chat.log("Zafa" + PositionCommon.createPos(
-    -resultZ,
-    -1,
-    resultX
-  ))
+
   return PositionCommon.createPos(
     -resultZ,
     -1,
