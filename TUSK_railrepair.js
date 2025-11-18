@@ -235,9 +235,11 @@ function cleanLine(pointA, pointB, reversed) {
   let refreshDirection = getRouteRightRailCleanDir(pointA, pointB);
   refreshDirection = refreshDirection.multiply(
     reversed
-      ? PositionCommon.createPos(-1, 1, -1)
+      ? PositionCommon.createPos(1, 1, 1)
       : PositionCommon.createPos(1, 1, 1)
   );
+  
+
   let lastCorrectPos = pointA;
   let timer_to_recover = 100;
   let jumping = 4;
@@ -282,7 +284,7 @@ function cleanLine(pointA, pointB, reversed) {
     plr.lookAt(lookDir.getX(), lookDir.getY(), lookDir.getZ());
     Client.waitTick();
     KeyBind.keyBind("key.attack", true);
-    KeyBind.keyBind("key.right", true);
+    KeyBind.keyBind("key.left", true);
     eat();
     // Correct y-level if fallen
     let progress = Math.round(
@@ -293,7 +295,7 @@ function cleanLine(pointA, pointB, reversed) {
       ` (${100 - progress}%)`
   }
   KeyBind.keyBind("key.attack", false);
-  KeyBind.keyBind("key.right", false);
+  KeyBind.keyBind("key.left", false);
   KeyBind.keyBind("key.sprint", false);
 }
 function lerp(a, b, t) {
@@ -352,9 +354,9 @@ function getRouteRightRailCleanDir(predecessor, successor) {
   }
 
   return PositionCommon.createPos(
-    resultZ * -Math.sign(resultZ),
+    -resultZ,
     -1,
-    resultX * -Math.sign(resultX)
+    resultX
   );
 }
 function actionBarManager() {
@@ -430,7 +432,7 @@ function main(recursive) {
         Player.getPlayer().getBlockPos().getZ()
       );
       cleanLine(part, route[goal_index], reversed);
-      KeyBind.keyBind("key.right", false);
+      KeyBind.keyBind("key.left", false);
       goal_index += increment;
     }
 
