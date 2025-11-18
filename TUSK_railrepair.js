@@ -33,6 +33,16 @@ let axes = [
 let lanes = 2;
 let actionBarMessage = "";
 
+function getDistPos3D(a, b) {
+    return PositionCommon.createVec(
+      a.getX(),
+      a.getY(),
+      a.getZ(),
+      b.getX(),
+      b.getY(),
+      b.getZ()
+    ).getMagnitude();
+}
 function getRailLength(route) {
   let goal_index = 1;
   let dist = 0;
@@ -228,6 +238,14 @@ function eat() {
   KeyBind.keyBind("key.use", false);
   return false;
 }
+function blockPosToEnt(bp) {
+    let p3d = bp.toPos3D()
+    return PositionCommon.createPos(
+        Math.floor(p3d.x) + 0.5,
+        Math.floor(p3d.y) + 0.5,
+        Math.floor(p3d.z) + 0.5,  
+    )
+}
 
 function cleanLine(pointA, pointB, reversed) {
   KeyBind.keyBind("key.sprint", true);
@@ -246,7 +264,7 @@ function cleanLine(pointA, pointB, reversed) {
   while (Math.round(plr.getBlockPos().distanceTo(pointB)) > 0) {
     // Walk to the next block
     if ((pointA.getY() - plr.getPos().getY()) > 0.6) {
-      KeyBind.keyBind("key.right", false);
+      KeyBind.keyBind("key.left", false);
       KeyBind.keyBind("key.attack", false);
       if (pointA.getY() - plr.getBlockPos().getY() > 10) {
         // give up lol
@@ -290,6 +308,42 @@ function cleanLine(pointA, pointB, reversed) {
     let progress = Math.round(
       (plr.getBlockPos().distanceTo(pointB) * 100) / pointA.distanceTo(pointB)
     );
+    let actual_progress = 1-getDistPos3D(plr.getPos(),pointB) / getDistPos3D(pointA,pointB)
+
+    let vantagePosition = blockPosToEnt(pointA).add(
+       blockPosToEnt(pointB).sub(blockPosToEnt(pointA)).multiply(actual_progress,actual_progress,actual_progress)
+    )
+    Hud.clearDraw3Ds();
+    let position_error =vantagePosition.sub(plr.getPos())
+    const blockColor = 0xB87333
+    let b = {
+        x: Math.floor(vantagePosition.x),
+        y: Math.floor(vantagePosition.y),
+        z: Math.floor(vantagePosition.z)
+    } 
+    const d = Hud.createDraw3D(); 
+    d.addBox(b.x, b.y - 1, b.z, b.x + 1, b.y, b.z + 1, blockColor,0xFFFFFF, blockColor, 0x333333, false);
+    Hud.registerDraw3D(d);
+
+    // Move backward if the position error is in the direction we're facing and vice versa
+    let dot = refreshDirection
+        .toVector()
+        .multiply(1, 0, 1, 1, 0, 1)
+        .dotProduct(position_error.toVector().normalize()) + 0.07;
+ 
+        KeyBind.keyBind("key.sneak", true)
+        if (dot > 0) {
+            KeyBind.keyBind("key.forward", true)
+            KeyBind.keyBind("key.back", false)
+        } else if (dot < -0.15) {
+            KeyBind.keyBind("key.forward", false)
+            KeyBind.keyBind("key.back", true)
+        } else {
+            KeyBind.keyBind("key.sneak", false)
+            KeyBind.keyBind("key.forward", false)
+            KeyBind.keyBind("key.back", false)
+        }
+
     actionBarMessage =
       `§aCleaning from (${pointA.getX()},${pointA.getY()},${pointA.getZ()}) to (${pointB.getX()},${pointB.getY()},${pointB.getZ()})` +
       ` (${100 - progress}%)`
@@ -297,6 +351,7 @@ function cleanLine(pointA, pointB, reversed) {
   KeyBind.keyBind("key.attack", false);
   KeyBind.keyBind("key.left", false);
   KeyBind.keyBind("key.sprint", false);
+  Hud.clearDraw3Ds();
 }
 function lerp(a, b, t) {
   return a + t * (b - a);
@@ -352,7 +407,7 @@ function getRouteRightRailCleanDir(predecessor, successor) {
   } else if (Math.abs(resultZ) < 0.6) {
     resultZ = 0;
   }
-
+    
   return PositionCommon.createPos(
     -resultZ,
     -1,
@@ -384,8 +439,7 @@ function main(recursive) {
       break;
     }
     if (
-      (!isOnLine(part, route[possible_goal_index], blockPos)) &&
-      possible_goal_index < route.length - 1
+      (!isOnLine(part, route[possible_goal_index], blockPos))
     ) {
       possible_goal_index += 1;
       continue;
@@ -394,7 +448,7 @@ function main(recursive) {
     predecessor = part;
     successor = route[possible_goal_index];
     possible_goal_index += 1;
-  }
+  } 
   if (predecessor && successor) {
     actionBarManager();
     let direction = plr.getFacingDirection().getVector();
