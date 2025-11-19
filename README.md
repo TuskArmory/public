@@ -1,4 +1,4 @@
-# Usage
+# Rail bot usage
 Assumes you already know how to use [JsMacros](https://jsmacros.wagyourtail.xyz/?general.html).
 1. Map rail route by it's coordinates, using the existing rails as coordinates.
 2. Set the bot's routeTemplate to be that rail
